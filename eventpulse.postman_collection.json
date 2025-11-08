@@ -1,0 +1,372 @@
+{
+  "info": {
+    "_postman_id": "3f7c1d46-7b92-4d5d-93da-ea872dcac5f8",
+    "name": "Event Management API - NestJS",
+    "description": "Colección para probar la API de eventos desarrollada con NestJS, TypeORM y MySQL.\n\nEndpoints activos:\n- Crear evento (con/sin imágenes)\n- Listar eventos (con paginación)\n- Crear usuario\n- Asignar usuario a evento\n- Ver asistentes de evento\n\nVersión: 1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Usuarios",
+      "description": "Operaciones para gestión de usuarios",
+      "item": [
+        {
+          "name": "Crear usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Usuario creado tiene los campos requeridos\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('displayName');",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"userId\", jsonData.id);",
+                  "    console.log(\"Usuario creado con ID: \" + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Juan Pérez\",\n  \"avatarUrl\": \"https://i.pravatar.cc/150?img=1\",\n  \"originWorld\": \"Earth-616\",\n  \"isAlive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "Crea un nuevo usuario.\n\n**Campos requeridos:**\n- displayName: Nombre del usuario (máx. 100 caracteres)\n\n**Campos opcionales:**\n- avatarUrl: URL de la imagen de perfil\n- originWorld: Mundo de origen\n- isAlive: Estado (default: true)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "description": "Operaciones para gestión de eventos",
+      "item": [
+        {
+          "name": "Crear evento (JSON)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Evento creado tiene los campos requeridos\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('date');",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"eventId\", jsonData.id);",
+                  "    console.log(\"Evento creado con ID: \" + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Conferencia de Node.js 2025\",\n  \"description\": \"Aprende las últimas novedades de Node.js, NestJS y desarrollo backend moderno.\",\n  \"date\": \"2025-06-15T09:00:00.000Z\",\n  \"location\": \"Centro de Convenciones - Auditorio Principal\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/event",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "event"
+              ]
+            },
+            "description": "Crea un nuevo evento sin imágenes.\n\n**Campos requeridos:**\n- title: Título del evento (máx. 250 caracteres)\n- date: Fecha en formato ISO 8601\n\n**Campos opcionales:**\n- description: Descripción (máx. 500 caracteres)\n- location: Ubicación del evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear evento con imágenes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Evento tiene imágenes cargadas\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('images');",
+                  "    if (jsonData.images) {",
+                  "        pm.expect(jsonData.images).to.be.an('array');",
+                  "        pm.expect(jsonData.images.length).to.be.greaterThan(0);",
+                  "        console.log(\"Se cargaron \" + jsonData.images.length + \" imagen(es)\");",
+                  "    }",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"eventId\", jsonData.id);",
+                  "    console.log(\"Evento con imágenes creado con ID: \" + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Conferencia Tech 2025",
+                  "type": "text",
+                  "description": "Título del evento (requerido)"
+                },
+                {
+                  "key": "description",
+                  "value": "Evento de tecnología con galería de imágenes",
+                  "type": "text",
+                  "description": "Descripción del evento (opcional)"
+                },
+                {
+                  "key": "date",
+                  "value": "2025-09-20T14:00:00.000Z",
+                  "type": "text",
+                  "description": "Fecha en formato ISO 8601 (requerido)"
+                },
+                {
+                  "key": "location",
+                  "value": "Centro de Convenciones Tech Hub",
+                  "type": "text",
+                  "description": "Ubicación (opcional)"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": [],
+                  "description": "Imágenes del evento (máx. 5, 5MB c/u)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/event",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "event"
+              ]
+            },
+            "description": "Crea un nuevo evento con imágenes.\n\n**Content-Type:** multipart/form-data\n\n**Formatos permitidos:**\n- JPG / JPEG\n- PNG\n- GIF\n- WEBP\n\n**Límites:**\n- Máximo 5 imágenes\n- 5MB por imagen\n\n**Instrucciones:**\n1. En 'images', haz clic en 'Select Files'\n2. Selecciona 1-5 imágenes\n3. Las imágenes se guardarán en /public/uploads/events/\n4. Accede a ellas en: http://localhost:3000/uploads/events/nombre-archivo.jpg"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar eventos (con paginación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta tiene estructura de paginación\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "    pm.expect(jsonData).to.have.property('limit');",
+                  "    pm.expect(jsonData).to.have.property('totalPages');",
+                  "});",
+                  "",
+                  "pm.test(\"Data es un array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (pm.response.json().data.length > 0) {",
+                  "    var firstEvent = pm.response.json().data[0];",
+                  "    pm.environment.set(\"eventId\", firstEvent.id);",
+                  "    console.log(\"Total de eventos: \" + pm.response.json().total);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/event?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "event"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Número de página (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Eventos por página (default: 10)"
+                }
+              ]
+            },
+            "description": "Obtiene eventos con paginación.\n\n**Query params:**\n- page: Número de página (default: 1)\n- limit: Resultados por página (default: 10)\n\n**Respuesta:**\n- data: Array de eventos\n- total: Total de eventos\n- page: Página actual\n- limit: Límite por página\n- totalPages: Total de páginas"
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar usuario a evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 200 o 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test(\"Usuario asignado correctamente\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('attendees');",
+                  "    console.log(\"Usuario asignado al evento exitosamente\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/event/{{eventId}}/register/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "event",
+                "{{eventId}}",
+                "register",
+                "{{userId}}"
+              ]
+            },
+            "description": "Asigna un usuario a un evento.\n\n**Parámetros:**\n- eventId: UUID del evento\n- userId: ID numérico del usuario\n\n**Respuesta:**\nRetorna el evento con la lista de asistentes actualizada."
+          },
+          "response": []
+        },
+        {
+          "name": "Ver asistentes del evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta es un array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "console.log(\"Total de asistentes: \" + pm.response.json().length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/event/{{eventId}}/attendees",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "event",
+                "{{eventId}}",
+                "attendees"
+              ]
+            },
+            "description": "Obtiene la lista de asistentes de un evento.\n\n**Parámetros:**\n- eventId: UUID del evento\n\n**Respuesta:**\nRetorna un array con los usuarios asignados al evento."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "",
+      "type": "string",
+      "description": "UUID del evento (se guarda automáticamente)"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string",
+      "description": "ID del usuario (se guarda automáticamente)"
+    }
+  ]
+}

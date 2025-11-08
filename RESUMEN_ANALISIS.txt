@@ -1,0 +1,4 @@
+ANALISIS PROYECTO REFERENCIA - NESTJS API DE EVENTOS
+
+Proyecto: Asesorias - API Gestion de Eventos
+Ubicacion: C:\Users\Amaro\Documentos\Trabajos\KeyCode - Nest Js\Clases\Asesorias
